@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Glitter Problem — A Story About Vera</title>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white:    #fefcf8;
+    --cream:    #faf4e8;
+    --cream-d:  #f0e8d4;
+    --ink:      #1a1410;
+    --ink-soft: #3a3028;
+    --ink-faint:#8a7a60;
+    --g1: #ff6b9d;   /* hot pink glitter */
+    --g2: #ffd700;   /* gold glitter */
+    --g3: #00d4ff;   /* cyan glitter */
+    --g4: #a855f7;   /* purple glitter */
+    --g5: #ff4500;   /* orange-red glitter */
+    --g6: #00e676;   /* green glitter */
+    --tape: rgba(255,220,100,0.55);
+    --tape-blue: rgba(150,210,255,0.5);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    overflow-x: hidden;
+    position: relative;
+    cursor: default;
+  }
+
+  /* Subtle grid background like graph paper */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(180,160,120,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,160,120,0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ── GLITTER PARTICLES ── */
+  .glitter-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  .glitter-particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    animation: glitterFall var(--dur, 1.8s) var(--delay, 0s) ease-in forwards;
+    transform: rotate(var(--rot, 0deg));
+  }
+
+  @keyframes glitterFall {
+    0%   { opacity:1; transform: translate(0,0) rotate(0deg) scale(1); }
+    20%  { opacity:1; }
+    100% { opacity:0; transform: translate(var(--tx,0px), var(--ty,80px)) rotate(var(--rot2,360deg)) scale(0.3); }
+  }
+
+  /* ── SNEEZE BURST — full screen flash ── */
+  .sneeze-flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at var(--ox,50%) var(--oy,50%),
+      rgba(255,215,0,0.35) 0%,
+      rgba(255,100,160,0.2) 30%,
+      transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 99;
+    animation: sneezeFlash 0.8s ease forwards;
+  }
+
+  @keyframes sneezeFlash {
+    0%   { opacity:0; }
+    15%  { opacity:1; }
+    100% { opacity:0; }
+  }
+
+  /* ── PAGE ── */
+  .page {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px 120px;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    padding: 64px 0 56px;
+    position: relative;
+    text-align: center;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .cover-eyebrow {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Abril Fatface', serif;
+    font-size: clamp(40px, 10vw, 96px);
+    line-height: 0.92;
+    letter-spacing: -1px;
+    color: var(--ink);
+    margin-bottom: 16px;
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Glitter smear behind title */
+  .title-glitter {
+    position: absolute;
+    inset: -12px -20px;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,107,157,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 40%, rgba(0,212,255,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(168,85,247,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index:-1;
+  }
+
+  .h1-line2 {
+    display: block;
+    color: var(--g1);
+  }
+
+  .cover-sub {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(15px, 2.2vw, 19px);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── COVER ILLUSTRATION — Vera sneezing ── */
+  .cover-vera {
+    display: block;
+    margin: 36px auto 0;
+    max-width: 340px;
+    width: 80%;
+    animation: floatVera 6s ease-in-out infinite;
+  }
+
+  @keyframes floatVera {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  /* ── STORY BODY ── */
+  .story {
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  p {
+    font-size: clamp(16px, 2.2vw, 19px);
+    line-height: 1.88;
+    margin-bottom: 24px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .dropcap::first-letter {
+    font-family: 'Abril Fatface', serif;
+    font-size: 86px;
+    float: left;
+    line-height: 0.80;
+    margin: 8px 12px 0 -4px;
+    color: var(--g1);
+  }
+
+  em { font-style: italic; }
+
+  .cname {
+    font-family: 'Abril Fatface', serif;
+    font-size: 0.95em;
+    letter-spacing: -0.5px;
+  }
+
+  /* ── SECTION BREAKS ── */
+  .break {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 52px 0;
+  }
+
+  .break::before, .break::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background: linear-gradient(90deg, transparent, var(--ink-faint), transparent);
+    opacity:0.3;
+  }
+
+  .break-inner {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  /* ── STICKER / LIE CARDS ── */
+  /* Each lie that triggers a sneeze is in a special clickable card */
+  .lie-card {
+    display: inline;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .lie-text {
+    background: var(--g2);
+    color: var(--ink);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.1em;
+    font-weight: 600;
+    position: relative;
+    display: inline;
+    transition: filter 0.2s;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.12);
+  }
+
+  .lie-card:hover .lie-text {
+    filter: brightness(1.1);
+  }
+
+  .lie-card .lie-label {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--g1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .lie-card:hover .lie-label { opacity: 1; }
+
+  /* ── GLITTER EVIDENCE BOARD ── */
+  /* Post-it note style entries of the lies caught */
+  .evidence-board {
+    background: var(--cream-d);
+    border: 1px solid rgba(180,160,120,0.3);
+    padding: 24px;
+    margin: 40px 0;
+    position: relative;
+    transform: rotate(-0.3deg);
+    box-shadow: 3px 4px 0 rgba(180,160,120,0.2);
+  }
+
+  /* Tape across top */
+  .evidence-board::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 16px;
+    background: var(--tape);
+    border-radius: 2px;
+  }
+
+  .board-title {
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(180,160,120,0.4);
+  }
+
+  .stickies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .sticky-lie {
+    padding: 14px 16px 18px;
+    font-family: 'Caveat', cursive;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    box-shadow: 2px 3px 8px rgba(60,40,20,0.15);
+    max-width: 170px;
+    min-width: 140px;
+    position: relative;
+  }
+
+  .sticky-lie::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0;
+    height:5px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 1px 1px 0 0;
+  }
+
+  .sticky-who {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .sticky-glitter-amount {
+    font-size: 11px;
+    margin-top: 8px;
+    display: block;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  /* Colour variants */
+  .sl-yellow  { background: #fef9c3; transform: rotate(-1.5deg); }
+  .sl-pink    { background: #fce7f3; transform: rotate(1.2deg); }
+  .sl-blue    { background: #dbeafe; transform: rotate(-0.8deg); }
+  .sl-green   { background: #dcfce7; transform: rotate(2deg); }
+  .sl-orange  { background: #ffedd5; transform: rotate(-1.2deg); }
+  .sl-purple  { background: #ede9fe; transform: rotate(0.8deg); }
+
+  /* ── LETTER FROM VERA'S MUM ── */
+  .mum-letter {
+    background: var(--white);
+    border: 1px solid rgba(180,160,120,0.3);
+    padding: 28px 32px;
+    margin: 36px 0;
+    position: relative;
+    transform: rotate(0.5deg);
+    box-shadow: 2px 3px 12px rgba(60,40,20,0.1);
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+
+  .mum-letter::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 40px;
+    width: 56px;
+    height: 18px;
+    background: var(--tape-blue);
+    border-radius: 2px;
+  }
+
+  .letter-head {
+    font-family: 'Abril Fatface', serif;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(180,160,120,0.3);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  .letter-sign {
+    margin-top: 14px;
+    font-style: italic;
+    color: var(--ink-faint);
+    font-size: 16px;
+  }
+
+  /* ── GLITTER CHART ── */
+  .glitter-chart {
+    background: var(--white);
+    border: 1px solid rgba(180,160,120,0.25);
+    padding: 20px 24px;
+    margin: 36px 0;
+    position: relative;
+  }
+
+  .chart-title {
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .chart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .chart-label {
+    font-family: 'Caveat', cursive;
+    font-style: italic;
+    color: var(--ink-soft);
+    min-width: 160px;
+    font-size: 15px;
+  }
+
+  .chart-bar {
+    flex: 1;
+    height: 14px;
+    background: rgba(180,160,120,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .chart-fill {
+    height: 100%;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Glitter shimmer on bars */
+  .chart-fill::after {
+    content:'';
+    position:absolute;
+    inset:0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    animation: shimmer 2s ease-in-out infinite;
+    background-size: 200% 100%;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .chart-value {
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    color: var(--ink-faint);
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* ── PULLQUOTE ── */
+  .pullquote {
+    margin: 44px 0;
+    text-align: center;
+    padding: 24px 16px;
+    position: relative;
+  }
+
+  .pullquote::before,
+  .pullquote::after {
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height:2px;
+    background: linear-gradient(90deg, transparent, var(--g1), var(--g2), var(--g3), transparent);
+    opacity:0.4;
+  }
+
+  .pullquote::before { top:0; }
+  .pullquote::after  { bottom:0; }
+
+  .pullquote p {
+    font-family: 'Abril Fatface', serif;
+    font-size: clamp(18px, 3vw, 26px);
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom:0;
+    letter-spacing: -0.3px;
+  }
+
+  /* ── END MARK ── */
+  .end-mark {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 36px;
+    border-top: 1px solid rgba(180,160,120,0.3);
+  }
+
+  .end-mark span {
+    font-family: 'Abril Fatface', serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--ink-faint);
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width:560px) {
+    .page { padding:0 20px 80px; }
+    .stickies { gap:10px; }
+    .sticky-lie { font-size:13px; max-width:145px; min-width:120px; }
+    .chart-label { min-width:120px; font-size:13px; }
+    .mum-letter { padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Glitter particle container -->
+<div class="glitter-container" id="glitterContainer"></div>
+
+<div class="page">
+
+  <!-- ── COVER ── -->
+  <div class="cover">
+    <span class="cover-eyebrow">A Story About</span>
+    <h1>
+      <div class="title-glitter"></div>
+      The Glitter<br>
+      <span class="h1-line2">Problem</span>
+    </h1>
+    <p class="cover-sub">In which <strong>Vera Finch</strong> is allergic to lies,<br>and everyone finds this deeply inconvenient,<br>especially people who are lying</p>
+
+    <!-- Vera SVG illustration -->
+    <svg class="cover-vera" viewBox="0 0 340 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background glitter cloud from sneeze -->
+      <ellipse cx="100" cy="160" rx="90" ry="50" fill="rgba(255,215,0,0.08)" />
+      <ellipse cx="90" cy="155" rx="60" ry="35" fill="rgba(255,107,157,0.07)" />
+
+      <!-- Glitter particles floating around her -->
+      <circle cx="50" cy="100" r="3" fill="#ffd700" opacity="0.8"/>
+      <circle cx="30" cy="130" r="2" fill="#ff6b9d" opacity="0.9"/>
+      <circle cx="75" cy="85" r="4" fill="#00d4ff" opacity="0.7"/>
+      <circle cx="20" cy="150" r="2" fill="#a855f7" opacity="0.8"/>
+      <circle cx="60" cy="200" r="3" fill="#ffd700" opacity="0.6"/>
+      <circle cx="40" cy="170" r="2" fill="#00e676" opacity="0.7"/>
+      <circle cx="15" cy="115" r="3" fill="#ff6b9d" opacity="0.5"/>
+      <circle cx="85" cy="210" r="2" fill="#00d4ff" opacity="0.6"/>
+      <circle cx="25" cy="75" r="2" fill="#ffd700" opacity="0.5"/>
+      <circle cx="110" cy="70" r="3" fill="#a855f7" opacity="0.6"/>
+      <!-- Diamond shapes -->
+      <path d="M 55 60 L 60 50 L 65 60 L 60 70 Z" fill="#ff6b9d" opacity="0.7"/>
+      <path d="M 25 185 L 30 175 L 35 185 L 30 195 Z" fill="#ffd700" opacity="0.6"/>
+      <path d="M 80 230 L 85 220 L 90 230 L 85 240 Z" fill="#00d4ff" opacity="0.5"/>
+
+      <!-- VERA — a girl mid-sneeze -->
+      <!-- Body -->
+      <rect x="158" y="165" width="36" height="80" rx="8" fill="#e8d4aa"/>
+      <!-- Dress / skirt -->
+      <path d="M 150 200 Q 155 260 176 265 Q 197 260 202 200 Z" fill="#ff6b9d" opacity="0.9"/>
+      <!-- Cardigan -->
+      <rect x="152" y="165" width="48" height="50" rx="6" fill="#ffd700" opacity="0.85"/>
+      <!-- Collar -->
+      <path d="M 170 165 Q 176 172 182 165" stroke="#e8d4aa" stroke-width="2" fill="none"/>
+
+      <!-- Arms — one up near face (sneezing posture) -->
+      <line x1="152" y1="185" x2="130" y2="170" stroke="#e8d4aa" stroke-width="8" stroke-linecap="round"/>
+      <line x1="130" y1="170" x2="128" y2="155" stroke="#e8d4aa" stroke-width="7" stroke-linecap="round"/>
+      <!-- Hand near face -->
+      <circle cx="128" cy="152" r="6" fill="#e8d4aa"/>
+
+      <!-- Other arm out -->
+      <line x1="200" y1="185" x2="222" y2="195" stroke="#e8d4aa" stroke-width="8" stroke-linecap="round"/>
+
+      <!-- Neck -->
+      <rect x="168" y="148" width="16" height="20" rx="4" fill="#e8d4aa"/>
+
+      <!-- Head -->
+      <circle cx="176" cy="135" r="30" fill="#f0dfc0"/>
+
+      <!-- Hair — dark, slightly wild -->
+      <path d="M 148 130 Q 150 100 176 95 Q 202 100 204 130" fill="#3a2010"/>
+      <path d="M 148 130 Q 142 118 146 108 Q 150 98 160 95" fill="#3a2010"/>
+      <path d="M 204 130 Q 210 118 206 108 Q 202 98 192 95" fill="#3a2010"/>
+      <!-- Hair detail -->
+      <path d="M 162 96 Q 176 88 190 96" stroke="#2a1808" stroke-width="2" fill="none"/>
+
+      <!-- Face — mid-sneeze expression -->
+      <!-- Eyes scrunched -->
+      <path d="M 163 128 Q 168 124 173 128" stroke="#3a2010" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M 179 128 Q 184 124 189 128" stroke="#3a2010" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Nose scrunched -->
+      <path d="M 174 133 Q 176 136 178 133" stroke="#c49a7a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- Mouth open for ACHOO -->
+      <path d="M 168 142 Q 176 150 184 142" fill="#c05a4a" />
+      <path d="M 170 143 Q 176 146 182 143" fill="#e87a6a"/>
+
+      <!-- ACHOO glitter burst from nose/mouth -->
+      <!-- Main burst -->
+      <ellipse cx="130" cy="145" rx="45" ry="28" fill="rgba(255,215,0,0.15)"/>
+      <!-- Glitter spray -->
+      <circle cx="100" cy="135" r="5" fill="#ffd700" opacity="0.9"/>
+      <circle cx="90" cy="150" r="4" fill="#ff6b9d" opacity="0.9"/>
+      <circle cx="82" cy="138" r="3" fill="#00d4ff" opacity="0.8"/>
+      <circle cx="110" cy="125" r="3" fill="#a855f7" opacity="0.8"/>
+      <circle cx="95" cy="160" r="4" fill="#ffd700" opacity="0.7"/>
+      <circle cx="78" cy="155" r="3" fill="#00e676" opacity="0.7"/>
+      <circle cx="105" cy="168" r="2" fill="#ff6b9d" opacity="0.8"/>
+      <circle cx="118" cy="130" r="2" fill="#ffd700" opacity="0.9"/>
+      <circle cx="75" cy="130" r="4" fill="#ff4500" opacity="0.6"/>
+      <!-- Diamond sparks -->
+      <path d="M 88 120 L 92 112 L 96 120 L 92 128 Z" fill="#ffd700" opacity="0.8"/>
+      <path d="M 70 143 L 74 135 L 78 143 L 74 151 Z" fill="#ff6b9d" opacity="0.7"/>
+      <path d="M 112 152 L 116 144 L 120 152 L 116 160 Z" fill="#00d4ff" opacity="0.7"/>
+
+      <!-- ACHOO text -->
+      <text x="55" y="108" font-family="'Abril Fatface', serif" font-size="22" fill="#ffd700" opacity="0.9" transform="rotate(-12 55 108)">ACHOO!</text>
+
+      <!-- Shoes -->
+      <ellipse cx="165" cy="245" rx="12" ry="5" fill="#3a2010"/>
+      <ellipse cx="191" cy="245" rx="12" ry="5" fill="#3a2010"/>
+
+      <!-- Glitter on floor -->
+      <ellipse cx="140" cy="248" rx="30" ry="6" fill="rgba(255,215,0,0.25)"/>
+      <circle cx="118" cy="246" r="2" fill="#ffd700"/>
+      <circle cx="125" cy="250" r="1.5" fill="#ff6b9d"/>
+      <circle cx="132" cy="244" r="2" fill="#00d4ff"/>
+      <circle cx="155" cy="248" r="1.5" fill="#a855f7"/>
+    </svg>
+  </div>
+
+  <!-- ── STORY ── -->
+  <div class="story">
+
+    <p class="dropcap">
+      <span class="cname">Vera Finch</span> had been allergic to lies since she was four years old, which was also when she had sneezed gold glitter onto the family cat, who had never forgiven her, and who sparkled faintly for the rest of its life.
+    </p>
+
+    <p>
+      The allergy was consistent, involuntary, and (as her mother frequently explained to teachers, relatives, and one very embarrassed school inspector) not something Vera did on purpose. She simply could not help it. A lie entered the room and Vera's nose knew, the way some people's knees know when rain is coming, and the sneeze arrived whether she wanted it to or not.
+    </p>
+
+    <p>
+      The glitter was always there. This was the part no doctor had been able to explain, and most had stopped trying. It emerged in colours that appeared to correspond (though Vera could not quite pin down the system) to the nature of the lie. Small social untruths produced pale gold, fine as dust. Large deliberate falsehoods produced something altogether more dramatic: thick, multicoloured, the kind that gets into carpets and resurfaces at Christmas.
+    </p>
+
+    <!-- GLITTER EVIDENCE BOARD -->
+    <div class="evidence-board">
+      <div class="board-title">Selected Incidents — Year 4 Through Present</div>
+      <div class="stickies">
+
+        <div class="sticky-lie sl-yellow">
+          <span class="sticky-who">Dad · Kitchen</span>
+          "I was not eating the good biscuits."
+          <span class="sticky-glitter-amount">⟡ Fine gold, 2 tbsp approx.</span>
+        </div>
+
+        <div class="sticky-lie sl-pink">
+          <span class="sticky-who">Mrs. Pell · Maths</span>
+          "This will be relevant to your life."
+          <span class="sticky-glitter-amount">⟡ Rose & amber, considerable</span>
+        </div>
+
+        <div class="sticky-lie sl-blue">
+          <span class="sticky-who">Priya · Lunch</span>
+          "I don't mind that you missed my party."
+          <span class="sticky-glitter-amount">⟡ Pale blue, very fine</span>
+        </div>
+
+        <div class="sticky-lie sl-green">
+          <span class="sticky-who">The Dentist</span>
+          "This won't hurt at all."
+          <span class="sticky-glitter-amount">⟡ Bright green, abundant</span>
+        </div>
+
+        <div class="sticky-lie sl-orange">
+          <span class="sticky-who">Grandma · Sunday</span>
+          "I made this from scratch."
+          <span class="sticky-glitter-amount">⟡ Warm orange, light dusting</span>
+        </div>
+
+        <div class="sticky-lie sl-purple">
+          <span class="sticky-who">The School Inspector</span>
+          "We value every child equally."
+          <span class="sticky-glitter-amount">⟡ Deep purple, catastrophic</span>
+        </div>
+
+      </div>
+    </div>
+
+    <p>
+      The school inspector incident was what had led to the letter home. The letter home was what had led to the meeting. The meeting was what had led to Vera sitting outside the headteacher's office, which was itself a small lie (it was called the headteacher's office but it was really a cupboard with pretensions), waiting to be told, she suspected, that she needed to control herself better.
+    </p>
+
+    <!-- MUM'S NOTE -->
+    <div class="mum-letter">
+      <div class="letter-head">Note from Vera's Mum — To Whoever Needs It</div>
+      Vera cannot help the sneezing. We have seen three doctors. One said it was psychosomatic. He sneezed glitter. He did not comment on this.
+      <br><br>
+      She is not doing it on purpose. She is not trying to embarrass anyone. She simply cannot be in the same room as something untrue without her nose knowing.
+      <br><br>
+      Please stop asking her to "try harder not to." This is like asking someone to try harder not to be short.
+      <br><br>
+      The glitter is biodegradable. We had it tested.
+      <div class="letter-sign">— Helena Finch (Vera's mum)</div>
+    </div>
+
+    <div class="break"><span class="break-inner">✦ &nbsp; ✦ &nbsp; ✦</span></div>
+
+    <p>
+      The headteacher, <span class="cname">Mr. Brody</span>, was a man who chose his words carefully, which Vera had always appreciated, because it meant that when she sat across from him she could get through a whole conversation without ruining his furniture. He had a very clean desk. He was clearly aware of how he'd kept it clean.
+    </p>
+
+    <p>
+      "The inspector was upset," he said.
+    </p>
+
+    <p>
+      "Yes," said Vera.
+    </p>
+
+    <p>
+      "He had glitter in his briefcase."
+    </p>
+
+    <p>
+      "Yes. I'm sorry about that."
+    </p>
+
+    <p>
+      Mr. Brody looked at her for a moment. "You're not sorry about the sneezing itself," he said. This was not a question.
+    </p>
+
+    <p>
+      "No," said Vera. "Not really. He said something that wasn't true."
+    </p>
+
+    <p>
+      "He said we had excellent pastoral care."
+    </p>
+
+    <p>
+      "Yes."
+    </p>
+
+    <p>
+      A long pause. The desk gleamed. Mr. Brody appeared to be weighing something. "He's not wrong that we try," he said finally.
+    </p>
+
+    <p>
+      Vera waited, her nose perfectly still.
+    </p>
+
+    <p>
+      "He's wrong that we always succeed," said Mr. Brody.
+    </p>
+
+    <p>
+      Still nothing from the nose. Vera relaxed very slightly.
+    </p>
+
+    <p>
+      "Right," she said.
+    </p>
+
+    <p>
+      "Right," said Mr. Brody. He straightened a pen on his desk. "I'd like you to stop sitting alone at lunch."
+    </p>
+
+    <p>
+      Vera frowned. "I don't sit alone because I want to."
+    </p>
+
+    <p>
+      "I know. I'm working on it." He looked at her directly. "Is that a lie?"
+    </p>
+
+    <p>
+      "No," said Vera, a little surprised. "You mean it."
+    </p>
+
+    <p>
+      "Good," said Mr. Brody. He stood, which meant the meeting was over. "You may go."
+    </p>
+
+    <div class="break"><span class="break-inner">✦ &nbsp; ✦ &nbsp; ✦</span></div>
+
+    <!-- GLITTER INTENSITY CHART -->
+    <div class="glitter-chart">
+      <div class="chart-title">Vera's Glitter Output by Lie Type</div>
+
+      <div class="chart-row">
+        <span class="chart-label">White lies (kindness)</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:18%; background:linear-gradient(90deg,#fef9c3,#fef08a);"></div></div>
+        <span class="chart-value">Fine dust</span>
+      </div>
+
+      <div class="chart-row">
+        <span class="chart-label">Self-deception</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:32%; background:linear-gradient(90deg,#fce7f3,#ff6b9d);"></div></div>
+        <span class="chart-value">Light</span>
+      </div>
+
+      <div class="chart-row">
+        <span class="chart-label">Professional fibs</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:55%; background:linear-gradient(90deg,#dbeafe,#60a5fa);"></div></div>
+        <span class="chart-value">Moderate</span>
+      </div>
+
+      <div class="chart-row">
+        <span class="chart-label">Things said to children</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:74%; background:linear-gradient(90deg,#dcfce7,#00e676);"></div></div>
+        <span class="chart-value">Heavy</span>
+      </div>
+
+      <div class="chart-row">
+        <span class="chart-label">Politicians (general)</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:91%; background:linear-gradient(90deg,#ede9fe,#a855f7,#ff6b9d);"></div></div>
+        <span class="chart-value">Significant</span>
+      </div>
+
+      <div class="chart-row">
+        <span class="chart-label">Lies people tell themselves</span>
+        <div class="chart-bar"><div class="chart-fill" style="width:62%; background:linear-gradient(90deg,#ffedd5,#ff9500);"></div></div>
+        <span class="chart-value">Variable</span>
+      </div>
+
+    </div>
+
+    <p>
+      The girl who sat next to her at lunch on the Monday after, because Mr. Brody had (it turned out) meant what he said, was named <span class="cname">Bea</span>, and she sat down with her tray and said, "I've been told to be your friend," which was so truthful it made Vera blink.
+    </p>
+
+    <p>
+      "That's honest," Vera said.
+    </p>
+
+    <p>
+      "I also actually want to," said Bea. "But I thought I should say the full thing."
+    </p>
+
+    <p>
+      The nose remained entirely quiet. Vera felt her shoulders drop about two inches from where she usually kept them.
+    </p>
+
+    <p>
+      "I'm going to sneeze a lot around you," Vera warned. "Not at you. Just near you. If people around you are lying."
+    </p>
+
+    <p>
+      Bea considered this. "Are people around me lying a lot?"
+    </p>
+
+    <p>
+      "Constantly," said Vera. "Most people are. They don't mean badly by it, usually. It's just that they say things that aren't quite true because the true thing is harder to say." She looked at her tray. "It makes school quite dusty."
+    </p>
+
+    <p>
+      Bea looked around the cafeteria (the loud tables, the quiet corners, the teachers pretending not to watch). "Does it ever make you feel bad? Knowing?"
+    </p>
+
+    <p>
+      Vera thought about this properly, the way she'd learned to, because people deserved proper thought. "Sometimes. When people are lying to themselves. That's the saddest kind." She picked up her fork. "The small lies for kindness are all right. My nose knows the difference, I think. Or, it's gentler, anyway. Less glitter."
+    </p>
+
+    <p>
+      "What's the worst kind?"
+    </p>
+
+    <p>
+      "The ones people have told so many times they've stopped knowing they're doing it," said Vera. "Those ones always produce the most. Because there's so much of it, built up."
+    </p>
+
+    <div class="pullquote">
+      <p>The nose was never wrong.<br>This was, at times, a very lonely thing to live with.<br>And also, occasionally, the most useful.</p>
+    </div>
+
+    <p>
+      They ate lunch. Bea told Vera about her dog, which had eaten an entire birthday cake and then acted, convincingly, as though it had not. This produced no glitter whatsoever, because Bea believed every word.
+    </p>
+
+    <p>
+      When the bell rang, Vera sneezed twice (something near the door, something near the lockers, nothing serious, pale gold, barely a dusting) and wiped her nose and picked up her bag.
+    </p>
+
+    <p>
+      "See you tomorrow?" said Bea.
+    </p>
+
+    <p>
+      "Yes," said Vera.
+    </p>
+
+    <p>
+      No glitter. A warm, completely unspectacular truth.
+    </p>
+
+    <p>
+      She went to her next class. The corridor was, as always, lightly shimmering. The school smelled of chalk and floor cleaner and, underneath both, the faint persistent scent of everything people hadn't quite managed to say exactly right.
+    </p>
+
+    <p>
+      It was, Vera thought, not so bad as it sounded. You got used to the glitter. And every so often, in the middle of all the ordinary untruths that people moved through like weather, someone said something so completely, simply true that the air went still and the nose went quiet and you remembered why it was worth being in rooms with people at all.
+    </p>
+
+    <p>
+      She had stopped trying to keep count of those moments. There were more than you'd think.
+    </p>
+
+  </div>
+
+  <div class="end-mark">
+    <span>End</span>
+  </div>
+
+</div>
+
+<script>
+  // ── Glitter particle system ──
+  const container = document.getElementById('glitterContainer');
+  const colours = ['#ff6b9d','#ffd700','#00d4ff','#a855f7','#ff4500','#00e676','#ff9500','#60a5fa'];
+  const shapes  = ['circle','diamond','star'];
+
+  function randomBetween(a,b){ return a + Math.random()*(b-a); }
+
+  function spawnParticles(x, y, count=40) {
+    // Flash
+    const flash = document.createElement('div');
+    flash.className = 'sneeze-flash';
+    flash.style.setProperty('--ox', x + 'px');
+    flash.style.setProperty('--oy', y + 'px');
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(), 900);
+
+    for(let i=0; i<count; i++){
+      const p = document.createElement('div');
+      p.className = 'glitter-particle';
+
+      const size  = randomBetween(4, 12);
+      const col   = colours[Math.floor(Math.random()*colours.length)];
+      const dur   = randomBetween(1.2, 2.4);
+      const delay = randomBetween(0, 0.3);
+      const tx    = randomBetween(-180, 180);
+      const ty    = randomBetween(40, 200);
+      const rot   = randomBetween(-360, 360);
+
+      p.style.cssText = `
+        left:${x + randomBetween(-30,30)}px;
+        top:${y + randomBetween(-20,20)}px;
+        width:${size}px;
+        height:${size}px;
+        background:${col};
+        --dur:${dur}s;
+        --delay:${delay}s;
+        --tx:${tx}px;
+        --ty:${ty}px;
+        --rot2:${rot}deg;
+        box-shadow:0 0 ${size}px ${col};
+      `;
+
+      // Some are diamonds
+      if(Math.random() > 0.6){
+        p.style.borderRadius = '0';
+        p.style.transform = `rotate(45deg)`;
+        p.style.width  = size * 0.7 + 'px';
+        p.style.height = size * 0.7 + 'px';
+      }
+
+      container.appendChild(p);
+      setTimeout(()=>p.remove(), (dur + delay)*1000 + 100);
+    }
+  }
+
+  // Trigger on lie card clicks
+  document.querySelectorAll('.lie-card').forEach(card => {
+    card.addEventListener('click', e => {
+      const rect = card.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, 55);
+    });
+  });
+
+  // Trigger on sticky lies hover
+  document.querySelectorAll('.sticky-lie').forEach(sticky => {
+    sticky.addEventListener('mouseenter', e => {
+      const rect = sticky.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, 25);
+    });
+  });
+
+  // Random ambient sneezes — very occasionally, somewhere on screen
+  function randomSneeze(){
+    const x = randomBetween(100, window.innerWidth - 100);
+    const y = randomBetween(100, window.innerHeight - 100);
+    spawnParticles(x, y, 18);
+    setTimeout(randomSneeze, randomBetween(12000, 28000));
+  }
+
+  setTimeout(randomSneeze, 5000);
+
+  // Sneeze when page loads — one big welcome burst
+  setTimeout(()=>{
+    spawnParticles(window.innerWidth/2, 200, 60);
+  }, 1200);
+</script>
+
+</body>
+</html>
